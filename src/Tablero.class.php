@@ -41,8 +41,9 @@ class Tablero
         for ($i=0; $i < 6; $i++) {
             $cartasCompletas .= '<div style="flex: 1 1 auto;">';
             for ($l=0; $l < 4; $l++) {
+                $idCarta = ($i.$l);
                 $cartaElegida = array_pop($cartasJuego);
-                $carta = new Carta($cartaElegida);
+                $carta = new Carta($idCarta, $cartaElegida);
                 $cartasCompletas .= $carta->draw();
             }
             $cartasCompletas .= '</div>';

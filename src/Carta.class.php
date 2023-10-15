@@ -160,9 +160,17 @@ class Carta
     ];
 
     private int $_idPersonaje;
+    private string $_idCarta;
 
-    public function __construct(int $idPersonaje=0)
+    public function __construct(string $idCarta = '0', int $idPersonaje = 0)
     {
+        // Identificador de carta.
+        if ($idCarta === '0') {
+            $this->_idCarta = bin2hex(openssl_random_pseudo_bytes(16));
+        } else {
+            $this->_idCarta = $idCarta;
+        }
+        // Selección del personaje.
         if ($idPersonaje === 0) {
             $this->setIdPersonaje(self::eligePersonajeAzar());
         } else {
@@ -188,17 +196,60 @@ class Carta
     public function draw()
     {
         $rutaImagen = sprintf('resources/%s.png', str_pad((string) $this->getIdPersonaje(), 3, '0', STR_PAD_LEFT));
+        $idEstaCarta = $this->_idCarta.'-'.$this->getIdPersonaje();
+        $selfStyle = '
+        <style>
+
+        .card-box-'.$idEstaCarta.' {
+            margin: 100px;
+            width: 200px;
+            height: 250px;
+            position: relative;
+            perspective: 1000px;
+          }
+          
+          .card-box-'.$idEstaCarta.' .card-reverse-'.$idEstaCarta.' {
+              transform: rotateY(180deg);
+          }
+          
+          #card-'.$idEstaCarta.' {
+            transform-style: preserve-3d;
+            transition: all 0.5s linear;
+          }
+          
+          #card-'.$idEstaCarta.' .front {
+            position: absolute;
+            backface-visibility: hidden;
+          }
+          
+          #card-'.$idEstaCarta.' .reverse {
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+          }
+
+        </style>
+        ';
+        $javascript = '
+        <script>
+        function cambiaCarta_'.$this->_idCarta.'() {
+            $(\'#card-'.$idEstaCarta.'\').toggleClass(\'card-reverse-'.$idEstaCarta.'\');
+            $(\'#card-'.$idEstaCarta.'\').toggleClass(\'card-reversed\');
+            comparaParejas();
+        }
+
+        </script>';
+
         $output = '
-        <div class="card" style="margin: 1rem;">
-            <div class="card-image">
-                <figure class="image" style="display: flex;align-items: center;flex-direction: column;">
-                    <img style="width: 15rem;padding: 1rem;" src="'.$rutaImagen.'" alt="Placeholder image">
-                </figure>
+        <div class="card-box-'.$idEstaCarta.'" style="margin: 1rem;">
+            <div id="card-'.$idEstaCarta.'" class="" onclick="cambiaCarta_'.$this->_idCarta.'()">
+                <input type="hidden" name="id-card-'.$idEstaCarta.'" value="'.$this->getIdPersonaje().'" />
+                <div class="front"><img src="resources/cover.png" /></div>
+                <div class="reverse"><img src="'.$rutaImagen.'" /></div>
             </div>
         </div>
         ';
 
-        return $output;
+        return $selfStyle.$javascript.$output;
     }
 }
 
