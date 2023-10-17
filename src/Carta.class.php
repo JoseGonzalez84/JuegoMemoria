@@ -159,28 +159,22 @@ class Carta
         151 => 'Mew'
     ];
 
-    private int $_idPersonaje;
-    private string $_idCarta;
 
-    public function __construct(string $idCarta = '0', int $idPersonaje = 0)
-    {
-        // Identificador de carta.
-        if ($idCarta === '0') {
-            $this->_idCarta = bin2hex(openssl_random_pseudo_bytes(16));
-        } else {
-            $this->_idCarta = $idCarta;
-        }
-        // Selección del personaje.
-        if ($idPersonaje === 0) {
-            $this->setIdPersonaje(self::eligePersonajeAzar());
-        } else {
-            $this->setIdPersonaje($idPersonaje);
-        }
+    public function __construct(
+        private string $_idCarta,
+        private string $_rutaPersonaje,
+        private int $_idPersonaje
+    ) {
     }
 
-    public static function eligePersonajeAzar()
+    public function setRutaPersonaje(string $ruta)
     {
-        return rand(0, count(self::LISTA_PERSONAJES));
+        $this->_rutaPersonaje = $ruta;
+    }
+
+    public function getRutaPersonaje()
+    {
+        return $this->_rutaPersonaje;
     }
 
     public function setIdPersonaje(int $idPersonaje)
@@ -193,35 +187,47 @@ class Carta
         return $this->_idPersonaje;
     }
 
+    public function setIdCarta(int $idCarta)
+    {
+        $this->_idCarta = $idCarta;
+    }
+
+    public function getIdCarta()
+    {
+        return $this->_idCarta;
+    }
+
     public function draw()
     {
-        $rutaImagen = sprintf('resources/%s.png', str_pad((string) $this->getIdPersonaje(), 3, '0', STR_PAD_LEFT));
+        //$rutaImagen = sprintf('resources/%s.png', str_pad((string) $this->getIdPersonaje(), 3, '0', STR_PAD_LEFT));
+        $rutaImagen = $this->getRutaPersonaje();
+        // Para la ruta del cover.
+        $carpetaPersonajes = explode('/', $rutaImagen);
+        unset($carpetaPersonajes[count($carpetaPersonajes)-1]);
+        $carpetaPersonajes = implode('/', $carpetaPersonajes);
+        $cover = $carpetaPersonajes.'/cover.png';
+        // Identificador de carta.
         $idEstaCarta = $this->_idCarta.'-'.$this->getIdPersonaje();
         $selfStyle = '
         <style>
 
-        .card-box-'.$idEstaCarta.' {
-            margin: 100px;
-            width: 200px;
-            height: 250px;
-            position: relative;
-            perspective: 1000px;
-          }
-          
           .card-box-'.$idEstaCarta.' .card-reverse-'.$idEstaCarta.' {
               transform: rotateY(180deg);
           }
-          
+
           #card-'.$idEstaCarta.' {
             transform-style: preserve-3d;
             transition: all 0.5s linear;
           }
-          
+
           #card-'.$idEstaCarta.' .front {
             position: absolute;
             backface-visibility: hidden;
+            height: 100%;
+            display: flex;
+            align-items: center;
           }
-          
+
           #card-'.$idEstaCarta.' .reverse {
             transform: rotateY(180deg);
             backface-visibility: hidden;
@@ -232,18 +238,19 @@ class Carta
         $javascript = '
         <script>
         function cambiaCarta_'.$this->_idCarta.'() {
-            $(\'#card-'.$idEstaCarta.'\').toggleClass(\'card-reverse-'.$idEstaCarta.'\');
-            $(\'#card-'.$idEstaCarta.'\').toggleClass(\'card-reversed\');
-            comparaParejas();
+            if (window.actionEnabled) {
+                $(\'#card-'.$idEstaCarta.'\').toggleClass(\'card-reverse-'.$idEstaCarta.'\');
+                $(\'#card-'.$idEstaCarta.'\').toggleClass(\'card-reversed\');
+                comparaParejas();
+            }
         }
-
         </script>';
 
         $output = '
-        <div class="card-box-'.$idEstaCarta.'" style="margin: 1rem;">
+        <div class="carta-caja card-box-'.$idEstaCarta.'">
             <div id="card-'.$idEstaCarta.'" class="" onclick="cambiaCarta_'.$this->_idCarta.'()">
                 <input type="hidden" name="id-card-'.$idEstaCarta.'" value="'.$this->getIdPersonaje().'" />
-                <div class="front"><img src="resources/cover.png" /></div>
+                <div class="front"><img src="'.$cover.'" /></div>
                 <div class="reverse"><img src="'.$rutaImagen.'" /></div>
             </div>
         </div>

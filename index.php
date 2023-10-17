@@ -1,6 +1,18 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+require_once "src/Menu.class.php";
 require_once "src/Tablero.class.php";
 require_once "src/Carta.class.php";
+require_once "src/Functions.class.php";
+
+
+if (isset($_POST['personajes']) === true) {
+    $rutaPersonajes = $_POST['personajes'];
+} else {
+    $rutaPersonajes = 'pokemon';
+}
 ?>
 
 <!DOCTYPE html>
@@ -8,16 +20,61 @@ require_once "src/Carta.class.php";
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://kit.fontawesome.com/3f787ec5e9.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <script src="https://code.jquery.com/jquery-3.7.1.slim.min.js" integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8=" crossorigin="anonymous"></script>
     <style>
+        .tablero {
+            display: flex;
+            width: 50%;
+            margin: 0 auto;
+            justify-content: center;
+        }
+        .tablero-columna {
+            flex: 1 1 auto;
+        }
+        .carta-caja {
+            width: 190px;
+            /*height: 250px;*/
+            position: relative;
+            perspective: 1000px;
+            padding: 1rem;
+        }
 
+        .carta-caja>div {
+            border: 4px solid;
+            border-radius: 8px;
+        }
+
+        .card-reversed {
+            box-shadow: none;
+        }
+
+        .front {
+            box-shadow: inset 0 0 0 1.5em #aab4f4;
+        }
+        .reverse {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            box-shadow: none;
+        }
     </style>
     <title>Juego de Memoria</title>
 </head>
 <body>
-    <?php new Tablero(true); ?>
+    <?php
+        $menu = new Menu();
+        list($lineas, $columnas) = $menu->getValorCantidadCartas();
+        $parametros = [
+            'lineas' => $lineas,
+            'columnas' => $columnas,
+            'rutaPersonajes' => $rutaPersonajes
+        ];
+        $tablero = new Tablero($parametros, true);
+    ?>
     <script>
+        window.actionEnabled = true;
         function comparaParejas() {
             var cartas = $('body').find('.card-reversed');
             if (cartas.length > 1) {
@@ -25,18 +82,24 @@ require_once "src/Carta.class.php";
                 let idCarta2 = cartas[1].id;
                 let tmpIdCarta1 = idCarta1.split('-');
                 let tmpIdCarta2 = idCarta2.split('-');
+                window.actionEnabled = false;
                 if (tmpIdCarta1[2] === tmpIdCarta2[2]) {
                     console.log('parejas!');
                     $('#'+idCarta1).removeAttr('onclick').removeClass('card-reversed');
                     $('#'+idCarta2).removeAttr('onclick').removeClass('card-reversed');
+                    window.actionEnabled = true;
                 } else {
                     console.log('No es lo mismo');
-                    $('#'+idCarta1).removeClass('card-reversed card-reverse-'+tmpIdCarta1[1]+'-'+tmpIdCarta1[2]);
-                    $('#'+idCarta2).removeAttr('card-reversed card-reverse-'+tmpIdCarta2[1]+'-'+tmpIdCarta2[2]);
+                    setTimeout(function(){
+                        $('#'+idCarta1).removeClass('card-reversed card-reverse-'+tmpIdCarta1[1]+'-'+tmpIdCarta1[2]);
+                        $('#'+idCarta2).removeClass('card-reversed card-reverse-'+tmpIdCarta2[1]+'-'+tmpIdCarta2[2]);
+                        window.actionEnabled = true;
+                    }, 2000);
                 }
             }
         }
     </script>
+    <a href="https://www.freepik.es/vector-gratis/lindo-gato-superheroe-vuelo_15769532.htm#fromView=search&term=felix+cat&page=1&position=10&track=ais&regularType=vector">Imagen de catalyststuff</a> en Freepik
 </body>
 
 </html>
