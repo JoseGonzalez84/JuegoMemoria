@@ -8,7 +8,7 @@ class Menu
     private string $_formJugarName = 'formJugar';
     private array $_cantidadesParaCartas = [
         '2*4' => 8,
-        '4*4' => 16,
+        '2*6' => 12,
         '4*6' => 24
     ];
 
@@ -21,15 +21,16 @@ class Menu
         }
 
         if (isset($_POST['cantidadCartas']) === true) {
-            $this->_cantidadCartas = $_POST['cantidadCartas'];
+            $cantidadCartasTmp = explode('*', $_POST['cantidadCartas']);
+            $this->_cantidadCartas = $cantidadCartasTmp[0]*$cantidadCartasTmp[1];
         } else {
-            $this->_cantidadCartas = '24';
+            $this->_cantidadCartas = 24;
         }
 
         if (isset($_POST['cantidadJugadores']) === true) {
             $this->_cantidadJugadores = $_POST['cantidadJugadores'];
         } else {
-            $this->_cantidadJugadores = '1';
+            $this->_cantidadJugadores = 1;
         }
 
         $this->draw();
@@ -69,15 +70,10 @@ class Menu
     private function getCantidadCartasSelector()
     {
         $opciones = [];
-        $cantidades = [
-            '2*4' => 8,
-            '4*4' => 16,
-            '4*6' => 24
-        ];
         // Obtenemos el contenido de la carpeta de recursos.
         $cantidades = $this->_cantidadesParaCartas;
         foreach ($cantidades as $value => $valorVisible) {
-            $seleccionado = ($this->getCantidadCartas() === $cantidad) ? 'selected ' : '';
+            $seleccionado = ($this->getCantidadCartas() === $valorVisible) ? 'selected ' : '';
             $opciones[] = '<option '.$seleccionado.'value="'.$value.'">'.$valorVisible.'</option>';
         }
 
@@ -112,7 +108,15 @@ class Menu
 
     public function getValorCantidadCartas()
     {
-        return []
+        $cantidades = $this->_cantidadesParaCartas;
+        foreach ($cantidades as $key => $valor) {
+            if ($valor === $this->getCantidadCartas()) {
+                $valorTemporal = explode('*', $key);
+                return [$valorTemporal[0], $valorTemporal[1]];
+            }
+        }
+
+        return [0,0];
     }
 
     public function draw()
