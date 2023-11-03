@@ -73,7 +73,8 @@ class Tablero
     {
         // Se van a obtener los identificadores de las cartas para jugar.
         $cartasJuego = [];
-        for ($i=0; $i < (self::NUMERO_CARTAS / 2); $i++) {
+        $numeroCartas = ($this->getColumnas()*$this->getLineas()) / 2;
+        for ($i=0; $i < $numeroCartas; $i++) {
             $personajeAleatorio = Functions::eligePersonajeAzar(count($this->_listadoPersonajes)-1);
             if (in_array($personajeAleatorio, $cartasJuego) === false) {
                 $cartasJuego[] = $personajeAleatorio;
@@ -82,6 +83,7 @@ class Tablero
                 $i--;
             }
         }
+        //var_dump($cartasJuego);
         // Se mezclan.
         shuffle($cartasJuego);
         // Se dibuja el tablero.

@@ -226,6 +226,12 @@ class Carta
             height: 100%;
             display: flex;
             align-items: center;
+            width: 100%;
+            border-radius: 5px;
+          }
+
+          #card-'.$idEstaCarta.' .front .front-image {
+            background-image: url('.$cover.');
           }
 
           #card-'.$idEstaCarta.' .reverse {
@@ -250,7 +256,7 @@ class Carta
         <div class="carta-caja card-box-'.$idEstaCarta.'">
             <div id="card-'.$idEstaCarta.'" class="" onclick="cambiaCarta_'.$this->_idCarta.'()">
                 <input type="hidden" name="id-card-'.$idEstaCarta.'" value="'.$this->getIdPersonaje().'" />
-                <div class="front"><img src="'.$cover.'" /></div>
+                <div class="front"><div class="front-image"></div></div>
                 <div class="reverse"><img src="'.$rutaImagen.'" /></div>
             </div>
         </div>

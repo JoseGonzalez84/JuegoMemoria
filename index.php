@@ -6,13 +6,6 @@ require_once "src/Menu.class.php";
 require_once "src/Tablero.class.php";
 require_once "src/Carta.class.php";
 require_once "src/Functions.class.php";
-
-
-if (isset($_POST['personajes']) === true) {
-    $rutaPersonajes = $_POST['personajes'];
-} else {
-    $rutaPersonajes = 'pokemon';
-}
 ?>
 
 <!DOCTYPE html>
@@ -26,19 +19,19 @@ if (isset($_POST['personajes']) === true) {
     <style>
         .tablero {
             display: flex;
-            width: 50%;
+            width: 100%;
             margin: 0 auto;
             justify-content: center;
+            padding: 0 1rem;
         }
         .tablero-columna {
             flex: 1 1 auto;
         }
         .carta-caja {
-            width: 190px;
-            /*height: 250px;*/
+            width: 100%;
             position: relative;
             perspective: 1000px;
-            padding: 1rem;
+            padding: 0.5rem;
         }
 
         .carta-caja>div {
@@ -53,11 +46,23 @@ if (isset($_POST['personajes']) === true) {
         .front {
             box-shadow: inset 0 0 0 1.5em #aab4f4;
         }
+
+        .front .front-image {
+            background-repeat: no-repeat;
+            background-size: cover;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
         .reverse {
             height: 150px;
             display: flex;
             align-items: center;
             box-shadow: none;
+        }
+        .reverse>img {
+            max-height: 100%;
+            margin: 0 auto;
         }
     </style>
     <title>Juego de Memoria</title>
@@ -69,10 +74,10 @@ if (isset($_POST['personajes']) === true) {
         $parametros = [
             'lineas' => $lineas,
             'columnas' => $columnas,
-            'rutaPersonajes' => $rutaPersonajes
+            'rutaPersonajes' => $menu->getCarpetasRecursos()
         ];
         $tablero = new Tablero($parametros, true);
-    ?>
+        ?>
     <script>
         window.actionEnabled = true;
         function comparaParejas() {
